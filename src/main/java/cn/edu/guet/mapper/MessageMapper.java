@@ -10,6 +10,7 @@ import java.util.List;
 @Mapper
 @Component
 public interface MessageMapper {
+    Message getMessage(int messageId);
     List<Message> getSendMessages(String sendId);
     List<Message> getReceiveMessages(String receiveId);
     void sendMessage(Message message);

@@ -5,12 +5,31 @@
     <title>Title</title>
     <link rel="stylesheet"  th:href="@{css/page.css}">
     <link rel="stylesheet"  th:href="@{css/viewMessages.css}">
+    <style>
+        .mask{
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+        }
+        #message{
+            position: relative;
+            margin: auto;
+            height: 300px;
+            width: 300px;
+            background: white;
+        }
+    </style>
     <script src="http://cdn.staticfile.org/jquery/3.6.0/jquery.js"></script>
     <script th:inline="javascript">
         $(function (){
             var pageNum = 1;
             var pageSize = 3;
             var lastPage;
+            //  当前用户的id
             var receiveId = "10324";
 
             $.ajax({
@@ -22,10 +41,6 @@
                     lastPage = data.navigateLastPage;
                 }
             })
-
-/*            $("#body").on('click', '#test111', function(){
-                view();
-            })*/
 
             function view(){
                 $.ajax({
@@ -116,6 +131,7 @@
                 })
             })
 
+            // 选择框全选
             $("#messageMain").on('click', '#setCheckBox', function(){
                 var flag = $("#setCheckBox").prop("checked");
                 $("input[name='messageCheckbox']").each(function(i){	//遍历
@@ -127,6 +143,25 @@
                 })
             })
 
+            // 显示详细内容
+            $("#body").on('click', '.messageTr', function (){
+                var messageId = $(this).find("input").attr("value");
+                $.ajax({
+                    url : 'viewMessage?messageId=' + messageId,
+                    async : false,
+                    method : 'post',
+                    success : function(data) {
+                        $(".mask").show();
+                        $(".mask").html(data);
+                    }
+                })
+            })
+
+            // 隐藏遮罩层
+            $("#body").on('click', '.mask', function (){
+                $(".mask").hide();
+            })
+
             // 删除消息
             function deleteMessage(messageId){
                 $.ajax({
@@ -134,7 +169,6 @@
                     async : false,
                     method : 'post',
                     success : function() {
-
                     }
                 })
             }
@@ -146,7 +180,6 @@
                     async : false,
                     method : 'post',
                     success : function() {
-
                     }
                 })
             }
@@ -168,14 +201,13 @@
                     $(".lq-page").append('<span class="page-after">下一页</span><span class="page-end">尾页</span>');
                 }
             }
-
         })
 
 
     </script>
 </head>
 <body id="body">
-<div>
+<div id="viewMessage">
 <!--        <input type="button" id="test111" value="显示">-->
     <div id="messageMain" class="messageinfo" th:fragment="messageinfo">
         <table id="messageTable">
@@ -189,26 +221,35 @@
             <tr>
                 <th><input type='checkbox' id='setCheckBox'/></th>
                 <th></th>
-                <th>接收人</th>
+                <th>发送人</th>
                 <th>主题</th>
                 <th>内容</th>
                 <th>时间</th>
             </tr>
             </thead>
             <tbody>
-            <tr th:each="message,messagesStat:${messages}">
+            <tr class="messageTr" th:each="message,messagesStat:${messages}">
                 <td><input type="checkbox" name="messageCheckbox" th:value="${message.messageId}"></td>
-                <td class='ckeckRead' th:value='${message.messageId}' type='0' th:if="${message.isRead} eq '0'"><div class='cir Ru'></div></td>
-                <td class='ckeckRead' th:value='${message.messageId}' type='1' th:if="${message.isRead} eq '1'"><div class='cir Rr'></div></td>
-                <td><span class='receiveId' th:text="${message.receiveId}"></span></td>
+                <td class='ckeckRead' th:value='${message.messageId}' type='0' th:if="${message.isRead} eq '0'"><div id='viewM' class='cir Ru'></div></td>
+                <td class='ckeckRead' th:value='${message.messageId}' type='1' th:if="${message.isRead} eq '1'"><div id='viewM' class='cir Rr'></div></td>
+                <td><span class='receiveId' th:text="${message.sendId}"></span></td>
                 <td><span class='title' th:text="${message.title}"></span></td>
                 <td><p class='content' th:text="${message.content}"></p></td>
                 <td><span class='sendTime' th:text="${message.sendTime}"></span></td>
+<!--                <td><input type="button" id="apply" value="回复" th:name="${message.sendId}"></td>-->
             </tr>
             </tbody>
         </table>
     </div>
     <div class="lq-page"></div>
+    <div class="mask">
+        <div id="message" class="message" th:fragment="viewMessage">
+            <span th:text="${message.title}"></span>
+            <span th:text="${message.sendId}"></span>
+            <span th:text="${message.sendTime}"></span>
+            <p th:text="${message.content}"></p>
+        </div>
+    </div>
 </div>
 </body>
 </html>
