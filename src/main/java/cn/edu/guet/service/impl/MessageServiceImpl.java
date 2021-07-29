@@ -19,6 +19,11 @@ public class MessageServiceImpl implements IMessageService {
 
 
     @Override
+    public Message getMessage(int messageId) {
+        return messageMapper.getMessage(messageId);
+    }
+
+    @Override
     public PageInfo getSendMessages(String sendId, int pageNum, int pageSize) {
         PageHelper.startPage(pageNum, pageSize);
         List<Message> messages = messageMapper.getSendMessages(sendId);

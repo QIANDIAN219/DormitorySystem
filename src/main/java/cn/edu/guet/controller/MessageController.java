@@ -32,6 +32,13 @@ public class MessageController {
         return messageService.getReceiveMessages(receiveId, pageNum, pageSize);
     }
 
+    @PostMapping("viewMessage")
+    public String viewMessage(int messageId, Model model){
+        Message message = messageService.getMessage(messageId);
+        model.addAttribute("message", message);
+        return "thymeleafMessages::viewMessage";
+    }
+
     @PostMapping("sendMessage")
     public void sendMessage(Message message){
         messageService.sendMessage(message);
@@ -70,4 +77,10 @@ public class MessageController {
         model.addAttribute("messages", messages.getList());
         return "thymeleafMessages::messageinfo";
     }
+
+    @GetMapping("index")
+    public String index(){
+        return "index";
+    }
+
 }
